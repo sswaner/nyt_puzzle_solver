@@ -1,28 +1,16 @@
 import math
-from itertools import combinations
+
 from datetime import datetime
 from pprint import pprint
 t1 = datetime.now()
 #letters = 'tgjrmsbliuae'
-letters = 'sokatycrmiel'
-letters = 'hedikbtwacrn'
-#letters = 'vbregnilcasf'
-
-letter_set = set([l for l in letters])
-
-def find_answers(words, letters):
-  matrix = []
-  for e in words:
-    for p in words:
-      if e != p:
-        if e[-1:] == p[:1]:
-          matrix.append((e, p))
-  answers = []
-  for answer in matrix:
-    #print("testing {0}".format(' '.join(answer)))
-    if letters - set([l for l in ''.join(answer)]) == set():
-      answers.append(answer)
-  return answers
+puzzle = 'sokatycrmiel'
+puzzle = 'hedikbtwacrn'
+#puzzle = 'adsrmntryico'
+#letters = 'qaefcnudlito'
+#letters = 'abcdefghilmn'
+#letters = '231de[dbmeat'
+#letters = None
 
 def find_answers_deep(words, letters):
   matrix = []
@@ -33,28 +21,25 @@ def find_answers_deep(words, letters):
           matrix.append((e, p))
   answers = []
   for answer in matrix:
-    if letters - set([l for l in ''.join(answer)]) == set():
+    if letters - set(''.join(answer)) == set():
       answers.append(answer)
   #answers = []
-  if len(answers) < 3:
-    max_len = 100
-    print("No two word answers, still searching")
-    print(len(matrix))
-    print(len(words))
-    for answer in matrix:
-      match_count = 0
-      for word in words:
-        #print(answer[1][-1:], word[:1])
-        if answer[1][-1:] == word[:1]:
-          
-          extended = answer + (word, )
-          if letters - set([l for l in ''.join(extended)]) == set():
-            #print(letters - set([l for l in ''.join(extended)]))
-            if len(''.join(extended)) < max_len:
-              #print("ANSWER:", extended)
-              answers.append(extended)
-              #max_len = len(''.join(answer))
-              match_count += 1
+  if len(answers) > 2:
+    return answers
+  max_len = 100
+  print("No two word answers, still searching")
+  for answer in matrix:
+    match_count = 0
+    for word in [w for w in words if answer[1][-1:] == w[:1]]:
+ 
+      extended = answer + (word, )
+      if letters - set(''.join(extended)) == set():
+        #print(letters - set([l for l in ''.join(extended)]))
+        if len(''.join(extended)) < max_len:
+          #print("ANSWER:", extended)
+          answers.append(extended)
+          #max_len = len(''.join(answer))
+          match_count += 1
 
 
   return answers
@@ -72,21 +57,32 @@ def check_word(word, letters):
       return False
   return True
 
-f = open("vertex_words.txt", 'r')
+def solve_puzzle(letters):
+  if not isinstance(letters, str):
+    return {'status': 'fail', 'error' : 'input not a string'}
+  response = {'status': 'success', 'error' : '' }
+  f = open("vertex_words.txt", 'r')
 
-words = [word.strip() for word in f.read().split('\n') 
-        if check_word(word.strip(), letters)]
-print(len(words), "matching words")
+  words = [word.strip() for word in f.read().split('\n') 
+          if check_word(word.strip(), letters)]
+  response['matching_words'] = len(words)
+  #letter_set = set([l for l in letters])
+  results = find_answers_deep(words, set(letters))
+  response['results'] = results
+  max_len = 100
+  best_answer = None
+  for result in results:
+    if len(''.join(result)) < max_len:
+      max_len = len(''.join(result))
+      best_answer = result
+  response['best_answer'] = best_answer
+  response['total_options'] = len(results)
+  
+  t2 = datetime.now()
+  response['process_time'] = t2 - t1
 
-results = find_answers_deep(words, letter_set)
-pprint(results)
-max_len = 100
-best_answer = None
-for result in results:
-  if len(''.join(result)) < max_len:
-    max_len = len(''.join(result))
-    best_answer = result
-print("Total Options:", len(results))
-print("Best Option: ", best_answer)
-t2 = datetime.now()
-print(t2 -t1)
+  return response
+
+if __name__ == '__main__':
+  test = solve_puzzle(puzzle)
+  pprint(test)
