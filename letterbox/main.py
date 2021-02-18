@@ -23,6 +23,12 @@ puzzle = 'stdfculohyim'
 puzzle = 'epgoakrnlwic'
 puzzle = 'dsayurhkozqe'
 puzzle = 'praeduoilntc'
+puzzle = 'ltareowmighj'
+puzzle = 'ouhbcrminate'
+puzzle = 'alotizenhxcu'
+puzzle = 'tizenhxcualo'
+puzzle = 'mlruatgyosnp'
+puzzle = 'ncxitperahlo'
 def find_answers_deep(words, letters):
   matrix = []
   for e in words:
@@ -34,6 +40,7 @@ def find_answers_deep(words, letters):
   for answer in matrix:
     if letters - set(''.join(answer)) == set():
       answers.append(answer)
+      #print(answer)
   #answers = []
   if len(answers) > 2:
     return answers
@@ -77,6 +84,7 @@ def solve_puzzle(letters):
   words = [word.strip() for word in f.read().split('\n') 
           if check_word(word.strip(), letters)]
   f.close()
+  pprint(words)
   response['matching_words'] = len(words)
   #letter_set = set([l for l in letters])
   results = find_answers_deep(words, set(letters))

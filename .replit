@@ -1,2 +1,3 @@
 language = "bash"
-run = "python3 main.py"
+run = "cd ./letterbox" 
+run = "python3 ./main.py -v"
